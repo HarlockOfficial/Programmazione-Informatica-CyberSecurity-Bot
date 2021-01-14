@@ -5,8 +5,22 @@ import bot_token
 from telegram.ext import Updater, CommandHandler, CallbackContext
 from telegram import Update, bot
 
+from time import time
+
+
+users = dict()
+
+
+def is_banned(user: str) -> bool:
+    with open("ban.log", "r") as f:
+        if user in f.readlines():
+            return True
+    return False
+
 
 def start(update: Update, context: CallbackContext):
+    if is_banned(str(update.message.chat.username)+","+str(update.message.chat.id)):
+        return
     with open("users.log", "r+") as f:
         content = f.readlines()
         if not str(update.message.chat.username)+","+str(update.message.chat.id) in content:
@@ -21,6 +35,12 @@ def bot_help(update: Update, context: CallbackContext):
 
 
 def ask(update: Update, context: CallbackContext):
+    if is_banned(str(update.message.chat.username)+","+str(update.message.chat.id)):
+        return
+    if update.message.chat.username in users.keys() and time() - users[update.message.chat.username] <= 30:
+        update.message.reply_text("Errore, puoi suggerire una canzone ogni 2 minuti")
+        return
+    users[update.message.chat.username] = time()
     # Domande durante i webinar limite antispam 1 domanda/min
     update.message.reply_text("hai chiesto una cosa, presto riceverai una risposta")
     pass
@@ -43,6 +63,16 @@ def today(update: Update, context: CallbackContext):
     pass
 
 
+def login(update: Update, context: CallbackContext):
+    # TODO implement add otp and login admin
+    pass
+
+
+def ban(update: Update, context: CallbackContext):
+    # TODO add user to ban.log by username (search in users.log)
+    pass
+
+
 def main():
     updater = Updater(bot_token.TOKEN, use_context=True)
     dp = updater.dispatcher
@@ -54,12 +84,15 @@ def main():
     dp.add_handler(CommandHandler("coffee", coffee))
     dp.add_handler(CommandHandler("today", today))
 
+    # admin functions
+    dp.add_handler(CommandHandler("login", login))
+    dp.add_handler(CommandHandler("ban", ban))
+
     # Invia Notifica a tutti i loggati (chiunque ha fatto start)
     with open("users.log", "r") as f:
         user_list = f.readlines()
         for user in user_list:
-            username, user_id = user.split(",")
-            print("Notification sent to:", username)
+            user_id = user.split(",")[1]
             bot.Bot(bot_token.TOKEN).send_message(chat_id=user_id, text="Il meet inizierà a breve")
 
     print("Bot Started")
