@@ -9,7 +9,7 @@ from time import time
 
 
 users = dict()
-
+otp = "0000"
 
 def is_banned(user: str) -> bool:
     with open("ban.log", "r") as f:
@@ -38,7 +38,7 @@ def ask(update: Update, context: CallbackContext):
     if is_banned(str(update.message.chat.username)+","+str(update.message.chat.id)):
         return
     if update.message.chat.username in users.keys() and time() - users[update.message.chat.username] <= 30:
-        update.message.reply_text("Errore, puoi suggerire una canzone ogni 2 minuti")
+        update.message.reply_text("Errore, puoi fare una domanda ogni 30 secondi")
         return
     users[update.message.chat.username] = time()
     # Domande durante i webinar limite antispam 1 domanda/min
@@ -52,7 +52,7 @@ def info(update: Update, context: CallbackContext):
     pass
 
 
-def coffee(update: Update, context: CallbackContext):
+def beer(update: Update, context: CallbackContext):
     # paypal link
     update.message.reply_text("Se ti dovessero piacere i webinar, sentiti libero di offrirci una birra!\n")
     pass
@@ -81,7 +81,7 @@ def main():
     dp.add_handler(CommandHandler("help", bot_help))
     dp.add_handler(CommandHandler("ask", ask))
     dp.add_handler(CommandHandler("info", info))
-    dp.add_handler(CommandHandler("coffee", coffee))
+    dp.add_handler(CommandHandler("beer", beer))
     dp.add_handler(CommandHandler("today", today))
 
     # admin functions
