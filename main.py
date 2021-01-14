@@ -54,7 +54,7 @@ def info(update: Update, context: CallbackContext):
 
 def coffee(update: Update, context: CallbackContext):
     # paypal link
-    update.message.reply_text("toss a coin to your witcher")
+    update.message.reply_text("Se ti dovessero piacere i webinar, sentiti libero di offrirci una birra!\n")
     pass
 
 
