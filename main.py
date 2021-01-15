@@ -3,7 +3,7 @@
 import bot_token
 
 from telegram.ext import Updater, CommandHandler, CallbackContext
-from telegram import Update, bot
+from telegram import Update, bot, ParseMode
 
 from time import time
 
@@ -35,7 +35,7 @@ def start(update: Update, unused: CallbackContext):
             users_log.flush()
     update.message.reply_text("Benvenuto al Webinar di Sicurezza Informatica.\n" +
                               "Il bot sarà attivo solo durante i webinar.\n" +
-                              "Per scoprire tutte le funzionalità, digita il comando /help")
+                              "Per scoprire tutte le funzionalità, digita il comando /help", parse_mode=ParseMode.MARKDOWN)
 
 
 def bot_help(update: Update, unused: CallbackContext):
@@ -43,24 +43,26 @@ def bot_help(update: Update, unused: CallbackContext):
                               "/ask Chiedici qualcosa privatamente, specificando se vuoi una risposta in privato\n" +
                               "/info Link utili\n" +
                               "/beer Contribuisci offrendoci una birra\n" +
-                              "/today Argomenti del giorno\n")
+                              "/today Argomenti del giorno\n", parse_mode=ParseMode.MARKDOWN)
 
 
 def ask(update: Update, unused: CallbackContext):
     if is_banned(str(update.message.chat.username) + "," + str(update.message.chat.id)):
         return
     if update.message.chat.username in users.keys() and time() - users[update.message.chat.username] <= 30:
-        update.message.reply_text("Errore, puoi fare una domanda ogni 30 secondi")
+        update.message.reply_text("Errore, puoi fare una domanda ogni 30 secondi", parse_mode=ParseMode.MARKDOWN)
         return
     users[update.message.chat.username] = time()
-    update.message.reply_text("La tua domanda è stata notificata, presto riceverai una risposta")
+    update.message.reply_text("La tua domanda è stata notificata, presto riceverai una risposta",
+                              parse_mode=ParseMode.MARKDOWN)
     print(update.message.chat.username, "ha chiesto:", update.message.text)
     with open("admin.log", "r") as admin_log:
         for user in admin_log.readlines():
             user_id = user.split(",")[1]
             bot.Bot(bot_token.TOKEN).send_message(chat_id=user_id,
                                                   text="Se devi bannare l'utente " + update.message.chat.username +
-                                                       "puoi usare /ban " + update.message.chat.username)
+                                                       "puoi usare /ban " + update.message.chat.username,
+                                                  parse_mode=ParseMode.MARKDOWN)
 
 
 def info(update: Update, unused: CallbackContext):
@@ -70,19 +72,17 @@ def info(update: Update, unused: CallbackContext):
                               "CyberSecurity\n" +
                               "Se vuoi contattarci in privato e non durante i meet, scrivici a\n" +
                               # "e-mail\n\tharlockofficial.github@gmail.com\n\ts01spacecowboy@gmail.com\nte"+
-                              "telegram\n\t@HarlockOfficial\n\t@SpaceCowboyS01")
-    pass
+                              "```telegram```\n\t@HarlockOfficial\n\t@SpaceCowboyS01", parse_mode=ParseMode.MARKDOWN)
 
 
 def beer(update: Update, unused: CallbackContext):
     # paypal link
     update.message.reply_text("Se ti dovessero piacere i webinar, sentiti libero di offrirci una birra!\n" +
-                              "https://www.paypal.me/eserciziinformatica")
-    pass
+                              "https://www.paypal.me/eserciziinformatica", parse_mode=ParseMode.MARKDOWN)
 
 
 def today(update: Update, unused: CallbackContext):
-    update.message.reply_text("")
+    update.message.reply_text("", parse_mode=ParseMode.MARKDOWN)
     pass
 
 
@@ -119,7 +119,7 @@ def main():
         user_list = f.readlines()
         for user in user_list:
             user_id = user.split(",")[1]
-            bot.Bot(bot_token.TOKEN).send_message(chat_id=user_id, text="Il meet inizierà a breve")
+            bot.Bot(bot_token.TOKEN).send_message(chat_id=user_id, text="Il meet inizierà a breve", parse_mode=ParseMode.MARKDOWN)
 
     print("Bot Started")
     updater.start_polling()
