@@ -26,12 +26,12 @@ def is_admin(user: str) -> bool:
 
 
 def start(update: Update, unused: CallbackContext):
-    if is_banned(str(update.message.chat.username)+","+str(update.message.chat.id)):
+    if is_banned(str(update.message.chat.username) + "," + str(update.message.chat.id)):
         return
     with open("users.log", "r+") as users_log:
         content = users_log.readlines()
-        if not str(update.message.chat.username)+","+str(update.message.chat.id) in content:
-            users_log.write(str(update.message.chat.username)+","+str(update.message.chat.id))
+        if not str(update.message.chat.username) + "," + str(update.message.chat.id) in content:
+            users_log.write(str(update.message.chat.username) + "," + str(update.message.chat.id))
             users_log.flush()
     update.message.reply_text("Benvenuto al Webinar di Sicurezza Informatica.\n" +
                               "Il bot sarà attivo solo durante i webinar.\n" +
@@ -39,11 +39,15 @@ def start(update: Update, unused: CallbackContext):
 
 
 def bot_help(update: Update, unused: CallbackContext):
-    update.message.reply_text("hai chiesto aiuto")
+    update.message.reply_text("/start Avvio del bot\n" +
+                              "/ask Chiedici qualcosa privatamente, specificando se vuoi una risposta in privato\n" +
+                              "/info Link utili\n" +
+                              "/beer Contribuisci offrendoci una birra\n" +
+                              "/today Argomenti del giorno\n")
 
 
 def ask(update: Update, unused: CallbackContext):
-    if is_banned(str(update.message.chat.username)+","+str(update.message.chat.id)):
+    if is_banned(str(update.message.chat.username) + "," + str(update.message.chat.id)):
         return
     if update.message.chat.username in users.keys() and time() - users[update.message.chat.username] <= 30:
         update.message.reply_text("Errore, puoi fare una domanda ogni 30 secondi")
@@ -56,28 +60,34 @@ def ask(update: Update, unused: CallbackContext):
             user_id = user.split(",")[1]
             bot.Bot(bot_token.TOKEN).send_message(chat_id=user_id,
                                                   text="Se devi bannare l'utente " + update.message.chat.username +
-                                                  "puoi usare /ban " + update.message.chat.username)
+                                                       "puoi usare /ban " + update.message.chat.username)
 
 
 def info(update: Update, unused: CallbackContext):
     # gruppo informatica, contatti e link (cartella/materiale/...)
-    update.message.reply_text("info e link magici")
+    update.message.reply_text("Siamo due studenti universitari che, dopo numerose richieste, abbiamo deciso di" +
+                              "creare questa serie di incontri per farvi conoscere il mondo delle CTF e della " +
+                              "CyberSecurity\n" +
+                              "Se vuoi contattarci in privato e non durante i meet, scrivici a\n" +
+                              # "e-mail\n\tharlockofficial.github@gmail.com\n\ts01spacecowboy@gmail.com\nte"+
+                              "telegram\n\t@HarlockOfficial\n\t@SpaceCowboyS01")
     pass
 
 
 def beer(update: Update, unused: CallbackContext):
     # paypal link
-    update.message.reply_text("Se ti dovessero piacere i webinar, sentiti libero di offrirci una birra!\n")
+    update.message.reply_text("Se ti dovessero piacere i webinar, sentiti libero di offrirci una birra!\n" +
+                              "https://www.paypal.me/eserciziinformatica")
     pass
 
 
 def today(update: Update, unused: CallbackContext):
-    update.message.reply_text("ferb, so cosa faremo oggi")
+    update.message.reply_text("")
     pass
 
 
 def ban(update: Update, unused: CallbackContext):
-    if not is_admin(str(update.message.chat.username)+","+str(update.message.chat.id)):
+    if not is_admin(str(update.message.chat.username) + "," + str(update.message.chat.id)):
         return
     user_to_ban = update.message.text
     with open("users.log", "r") as users_log:
