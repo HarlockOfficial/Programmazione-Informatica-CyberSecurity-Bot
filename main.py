@@ -49,8 +49,14 @@ def ask(update: Update, unused: CallbackContext):
         update.message.reply_text("Errore, puoi fare una domanda ogni 30 secondi")
         return
     users[update.message.chat.username] = time()
-    update.message.reply_text("hai chiesto una cosa, presto riceverai una risposta")
+    update.message.reply_text("La tua domanda è stata notificata, presto riceverai una risposta")
     print(update.message.chat.username, "ha chiesto:", update.message.text)
+    with open("admin.log", "r") as admin_log:
+        for user in admin_log.readlines():
+            user_id = user.split(",")[1]
+            bot.Bot(bot_token.TOKEN).send_message(chat_id=user_id,
+                                                  text="Se devi bannare l'utente " + update.message.chat.username +
+                                                  "puoi usare /ban " + update.message.chat.username)
 
 
 def info(update: Update, unused: CallbackContext):
@@ -95,8 +101,7 @@ def main():
     dp.add_handler(CommandHandler("beer", beer))
     dp.add_handler(CommandHandler("today", today))
 
-    # admin functions
-    dp.add_handler(CommandHandler("login", login))
+    # admin function
     dp.add_handler(CommandHandler("ban", ban))
 
     # Invia Notifica a tutti i loggati (chiunque ha fatto start)
