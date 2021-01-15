@@ -1,5 +1,5 @@
 bot_token.py
-users.log
+*.log
 .idea/
 
 # Byte-compiled / optimized / DLL files
